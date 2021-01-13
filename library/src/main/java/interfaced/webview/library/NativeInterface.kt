@@ -11,6 +11,5 @@ import kotlinx.serialization.json.jsonObject
  * Every method has to return a String that is a valid Json String
  */
 interface NativeInterface {
-    fun onBodyHeightChanged(height: JsonElement?): String?
 }
 

@@ -6,7 +6,11 @@ import android.webkit.WebView
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
-class JSAsync(private val webview: WebView, private val nativeInterface: NativeInterface) {
+class JSAsync(
+    private val webview: InterfacedWebView,
+    private val nativeInterface: NativeInterface,
+    private val onUpdateHeight: ((Int) -> Unit)? = null
+) {
 
     @JavascriptInterface
     fun run(handler: String, method: String, parametersJson: String) {
@@ -15,7 +19,8 @@ class JSAsync(private val webview: WebView, private val nativeInterface: NativeI
                 val json: JsonElement = Json.parseToJsonElement(parametersJson)
                 Log.d("JSAsync", "running $handler method $method with $json")
                 val result =
-                    nativeInterface.javaClass.getMethod(method, JsonElement::class.java).invoke(nativeInterface, json)
+                    nativeInterface.javaClass.getMethod(method, JsonElement::class.java)
+                        .invoke(nativeInterface, json)
                 if (result != null && result !is String) {
                     throw IllegalArgumentException("Result of the method call is not a String. Only strings/valid json strings are supported")
                 }
@@ -30,6 +35,11 @@ class JSAsync(private val webview: WebView, private val nativeInterface: NativeI
                 reject(handler, e.message.toString())
             }
         }
+    }
+
+    @JavascriptInterface
+    fun updateHeight(height: String) {
+        onUpdateHeight?.invoke(height.toInt())
     }
 
     private fun reject(handler: String, error: String) {

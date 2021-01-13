@@ -13,7 +13,7 @@ interface WebViewClientInterface {
     }
     fun onPageFinished(url: String) {}
     fun onPageStarted(url: String) {}
-    fun onError(error: Error) {}
+    fun onError(error: Error, failingUrl: String?) {}
 }
 
 open class DelegatedWebViewClient(
@@ -110,7 +110,7 @@ open class DelegatedWebViewClient(
             return
         }
 
-        sendError(error?.let { WebViewResourceError(it, request) })
+        sendError(error?.let { WebViewResourceError(it, request) }, request?.url.toString())
     }
 
     override fun onReceivedError(
@@ -125,7 +125,7 @@ open class DelegatedWebViewClient(
             }
         }
 
-        sendError(WebViewResourceError(errorCode, description, failingUrl))
+        sendError(WebViewResourceError(errorCode, description, failingUrl), failingUrl)
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -143,18 +143,18 @@ open class DelegatedWebViewClient(
         }
 
 
-        sendError(errorResponse?.let { WebViewHttpError(it, request) })
+        sendError(errorResponse?.let { WebViewHttpError(it, request) }, request?.url.toString())
     }
 
     override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
         super.onReceivedSslError(view, handler, error)
 
-        sendError(error?.let { WebViewSSLError(it) })
+        sendError(error?.let { WebViewSSLError(it) }, view?.url)
     }
 
-    private fun sendError(error: Error?) {
+    private fun sendError(error: Error?, failingUrl: String?) {
         delegates.toList().forEach {
-            it.onError(error ?: WebViewError)
+            it.onError(error ?: WebViewError, failingUrl)
         }
     }
 

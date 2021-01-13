@@ -1,7 +1,9 @@
 // create an Observer instance
 var resizeObserver = new ResizeObserver(function (entries) {
   var height = entries[0].target.clientHeight
-  runNativeMethod("onBodyHeightChanged", height)
+  if (window.JSNativeAsync) {
+    JSNativeAsync.updateHeight(height)
+  }
 })
 
 // start observing a DOM node

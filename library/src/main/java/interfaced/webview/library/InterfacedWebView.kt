@@ -4,12 +4,15 @@ import android.content.Context
 import android.os.Build
 import android.util.AttributeSet
 import android.util.Base64
+import android.view.animation.AccelerateInterpolator
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.annotation.RequiresApi
+import interfaced.webview.library.animation.SlideAnimation
 import kotlinx.serialization.descriptors.PrimitiveKind
 import java.net.URLEncoder
 import java.nio.charset.Charset
+import kotlin.math.roundToInt
 
 class InterfacedWebView @JvmOverloads constructor(
     context: Context,
@@ -21,10 +24,14 @@ class InterfacedWebView @JvmOverloads constructor(
     defStyleAttr
 ) {
 
-    fun setup(config: FeaturesConfig, nativeInterface: NativeInterface) {
+    fun setup(
+        config: FeaturesConfig,
+        nativeInterface: NativeInterface,
+        onUpdateHeight: ((Int) -> Unit)? = null
+    ) {
         settings.javaScriptEnabled = true
 
-        addJavascriptInterface(JSAsync(this, nativeInterface), "JSNativeAsync")
+        addJavascriptInterface(JSAsync(this, nativeInterface, onUpdateHeight), "JSNativeAsync")
         webViewClient = DelegatedWebViewClient(config).apply {
             addDelegate(object : WebViewClientInterface {
                 override fun onPageFinished(url: String) {
@@ -40,6 +47,43 @@ class InterfacedWebView @JvmOverloads constructor(
         if (supportHeightUpdates) {
             injectJs("height.js")
         }
+    }
+
+//    /**
+//     * Scales proportionally to cover content
+//     * Can be used to scale Gif images
+//     */
+//    fun scaleTo(contentWidth: Int, contentHeight: Int) {
+//        reset()
+//        val scale = contentWidth / width.toDouble()
+//        val webViewHeight = contentHeight / scale
+//        setHeight(webViewHeight.roundToInt())
+//        settings.setLoadWithOverviewMode(true)
+//        settings.setUseWideViewPort(true)
+//    }
+
+    fun setHeight(height: Int) {
+        reset()
+        layoutParams.height = height
+        requestLayout()
+    }
+
+    fun animateToHeight(height: Int, duration: Long) {
+        reset()
+        val anim = SlideAnimation(this, height)
+        anim.interpolator = AccelerateInterpolator()
+        anim.duration = duration
+        clearAnimation()
+        startAnimation(anim)
+    }
+
+    fun makeDebuggable() {
+        setWebContentsDebuggingEnabled(true)
+    }
+
+    private fun reset() {
+        settings.setLoadWithOverviewMode(false)
+        settings.setUseWideViewPort(false)
     }
 
     private fun injectJs(assetName: String) {

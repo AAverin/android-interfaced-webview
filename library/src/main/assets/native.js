@@ -1,16 +1,12 @@
 "use strict"
 
 var runNativeMethod = function runNativeMethod(method, parametersJson) {
-  var _isiOS = function _isiOS() {
-    return window.webkit && window.webkit.messageHandlers["JSNativeAsync"]
-  }
-
   var _isAndroid = function _isAndroid() {
     return window.JSNativeAsync
   }
 
-  if (!_isiOS() && !_isAndroid()) {
-    console.error("Native bridge is not available")
+  if (!_isAndroid()) {
+    console.error("Android Native bridge is not available")
     return
   }
 

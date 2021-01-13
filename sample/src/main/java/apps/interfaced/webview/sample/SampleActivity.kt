@@ -20,13 +20,12 @@ class SampleActivity : AppCompatActivity() {
         webview.setup(
             FeaturesConfig(),
             object : NativeInterface {
-                override fun onBodyHeightChanged(height: JsonElement?) {
-                    Log.d("SampleActivity", "onBodyHeightChanged $height")
-                }
 
+            }, {
+                Log.d("SampleActivity", "onBodyHeightChanged $it")
             }
         )
-        WebView.setWebContentsDebuggingEnabled(true)
+        webview.makeDebuggable()
 
         button.setOnClickListener {
             val urlText = url.text.toString()

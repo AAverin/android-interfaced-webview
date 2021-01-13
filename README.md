@@ -33,11 +33,13 @@ Purpose of **android-interfaced-webview** is to have a better communication betw
 
 ## What can it do
 
+### Js-Native-Js communication
+
 **android-interaced-webview** serves a low-level implementation that adds support for Promise-based js calls of native methods and allows to listen for webview document height changes.
 
 It provides 2 small js scripts that are injected after every page loads inside webview:
 - *native.js* that allows to asynchronously call any defined native method
-- *height.js* that adds a listener of the document height, calling a native "OnBodyHeightChanged(height)" method
+- *height.js* that adds a listener of the document height, calling a native "updateHeight(height)" method
 
 As a result, every webpage loaded in **android-interfaced-webview** will have a new **asynchronous** method available in javacript world
 
@@ -49,11 +51,15 @@ As a result, every webpage loaded in **android-interfaced-webview** will have a 
 
 Web-development team is free to call any of the supported methods via `runNativeMethod`.
 
+### Automatic height updates
+
+When setting up the webview, you can pass in a callback, that will be called every time webpage body height changes.
+
+In the callback you can either call some manual implementation or use one of the height update methods available on the IntefacedWebView
+
 ## How to use it
 
-Call a setup method on the webview and provide NativeInterface implementation.
-
-These would be the methods that you will support, these methods can be called from javascript. The only required method to implement is `onBodyHeightChanged`, it will be called when webpage body height changes.
+Call a setup method on the webview and provide NativeInterface implementation. These would be the methods that you will support, these methods can be called from javascript.
 
 Every method on NativeInterface can have only one optional parameter of `JsonElement`. This would allow javascript to pass parameters into native.
 
@@ -75,11 +81,9 @@ webview.setup(
 
 ## WebViewClients
 
-By default, library attached `DelegatedWebViewClient` and calls `injectScripts` method in `onPageFinished`.
+By default, library attaches `DelegatedWebViewClient` and calls `injectScripts` method in `onPageFinished`.
 
-If you want to attach a custom WebViewClient, be sure to also call `injectScripts` when page finished loading.
-
-Library provides following implementations of WebViewClient.
+If you want to attach a custom WebViewClient, be sure to also call `InterfacedWebView.injectScripts` when page finished loading.
 
 ### DelegatedWebViewClient
 
@@ -92,21 +96,17 @@ interface WebViewClientInterface {
     }
     fun onPageFinished(url: String) {}
     fun onPageStarted(url: String) {}
-    fun onError(error: Error) {}
+    fun onError(error: Error, failingUrl: String?) {}
 }
 ```
 
 Use it to react on some things happening inside webview.
 
-### FlowableWebViewClient
-
-A special implementation of DelegatedWebViewClient that exposes same methods as FlowEvents that can be subscribed on.
-
 ## Recommendations
 
 With **android-interfaced-webview** your Web team can expect to have `runNativeMethod` present in every template they build. Method will become available after the page was loaded.
 
-To ensure smooth implementation, it is recommended that your Web team implements a wrapper library using their favorite technology stack, that would be calling native methods via `runNativeMethod`. Native development team and Web development team **must** agree on which methods are supported and what is the exepected functionality.
+To ensure smooth implementation, it is recommended that your Web team implements a wrapper library using their favorite technology stack, that would be calling native methods via `runNativeMethod`. Native development team and Web development team **must** agree on which methods are supported and what is the expected functionality.
 
 ## Recipes
 
