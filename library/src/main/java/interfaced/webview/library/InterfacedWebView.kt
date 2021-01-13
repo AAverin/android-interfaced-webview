@@ -7,6 +7,7 @@ import android.util.Base64
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.annotation.RequiresApi
+import kotlinx.serialization.descriptors.PrimitiveKind
 import java.net.URLEncoder
 import java.nio.charset.Charset
 
@@ -27,13 +28,17 @@ class InterfacedWebView @JvmOverloads constructor(
         webViewClient = DelegatedWebViewClient(config).apply {
             addDelegate(object : WebViewClientInterface {
                 override fun onPageFinished(url: String) {
-                    injectJs("native.js")
-
-                    if (config.supportHeightUpdates) {
-                        injectJs("height.js")
-                    }
+                    injectScripts(config.supportHeightUpdates)
                 }
             })
+        }
+    }
+
+    fun injectScripts(supportHeightUpdates: Boolean) {
+        injectJs("native.js")
+
+        if (supportHeightUpdates) {
+            injectJs("height.js")
         }
     }
 
