@@ -1,4 +1,4 @@
-package apps.nmt.webview.sample
+package apps.interfaced.webview.sample
 
 import org.junit.Test
 

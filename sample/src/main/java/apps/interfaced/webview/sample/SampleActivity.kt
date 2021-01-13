@@ -1,25 +1,31 @@
-package apps.nmt.webview.sample
+package apps.interfaced.webview.sample
 
 import android.os.Bundle
+import android.util.Log
 import android.webkit.URLUtil
 import android.webkit.WebView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import interfaced.webview.library.FeaturesConfig
+import interfaced.webview.library.NativeInterface
 import kotlinx.android.synthetic.main.sample_activity.*
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 
 class SampleActivity : AppCompatActivity() {
-
-    private val payload = mapOf(
-        "demokey1" to "demovalue1",
-        "demokey2" to "demovalue2"
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.sample_activity)
 
+        webview.setup(
+            FeaturesConfig(),
+            object : NativeInterface {
+                override fun onBodyHeightChanged(height: JsonElement?) {
+                    Log.d("SampleActivity", "onBodyHeightChanged $height")
+                }
+
+            }
+        )
         WebView.setWebContentsDebuggingEnabled(true)
 
         button.setOnClickListener {
@@ -30,8 +36,7 @@ class SampleActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            webview.postUrl(urlText, Json.encodeToString(payload).toByteArray())
-            Toast.makeText(this, "Posted payload $payload", Toast.LENGTH_SHORT).show()
+            webview.loadUrl(urlText)
         }
     }
 

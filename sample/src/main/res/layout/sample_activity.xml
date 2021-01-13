@@ -5,16 +5,18 @@
 
     <EditText
         android:id="@+id/url"
+        android:text="https://example.com"
+        android:inputType="textWebEmailAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <Button
         android:id="@+id/button"
-        android:text="POST"
+        android:text="LOAD"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <WebView
+    <interfaced.webview.library.InterfacedWebView
         android:id="@+id/webview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
