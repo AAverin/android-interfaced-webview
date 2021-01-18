@@ -1,18 +1,11 @@
 package interfaced.webview.library
 
 import android.content.Context
-import android.os.Build
 import android.util.AttributeSet
 import android.util.Base64
 import android.view.animation.AccelerateInterpolator
 import android.webkit.WebView
-import android.webkit.WebViewClient
-import androidx.annotation.RequiresApi
 import interfaced.webview.library.animation.SlideAnimation
-import kotlinx.serialization.descriptors.PrimitiveKind
-import java.net.URLEncoder
-import java.nio.charset.Charset
-import kotlin.math.roundToInt
 
 class InterfacedWebView @JvmOverloads constructor(
     context: Context,
@@ -24,27 +17,42 @@ class InterfacedWebView @JvmOverloads constructor(
     defStyleAttr
 ) {
 
+    private var webViewDelegate: WebViewClientInterface? = null
+    private var delegatedWebViewClient: DelegatedWebViewClient? = null
+
     fun setup(
         config: FeaturesConfig,
         nativeInterface: NativeInterface,
         onUpdateHeight: ((Int) -> Unit)? = null
     ) {
         settings.javaScriptEnabled = true
-
+        webViewDelegate = object : WebViewClientInterface {
+            override fun onPageFinished(url: String) {
+                injectScripts(config.supportNativeInterface, config.supportHeightUpdates)
+            }
+        }
+        delegatedWebViewClient = DelegatedWebViewClient(config).apply {
+            addDelegate(webViewDelegate!!)
+        }
+        this.webViewClient = delegatedWebViewClient!!
         addJavascriptInterface(JSAsync(this, nativeInterface, onUpdateHeight), "JSNativeAsync")
-        webViewClient = DelegatedWebViewClient(config).apply {
-            addDelegate(object : WebViewClientInterface {
-                override fun onPageFinished(url: String) {
-                    injectScripts(config.supportHeightUpdates)
-                }
-            })
+    }
+
+    fun clean() {
+        webViewDelegate?.let {
+            delegatedWebViewClient?.removeDelegate(it)
         }
     }
 
-    fun injectScripts(supportHeightUpdates: Boolean) {
-        injectJs("native.js")
-
+    fun injectScripts(
+        supportNativeInterface: Boolean = true,
+        supportHeightUpdates: Boolean = true
+    ) {
+        if (supportNativeInterface) {
+            injectJs("native.js")
+        }
         if (supportHeightUpdates) {
+            injectJs("resizeObserverPolyfill.js")
             injectJs("height.js")
         }
     }
@@ -69,7 +77,7 @@ class InterfacedWebView @JvmOverloads constructor(
     }
 
     fun animateToHeight(height: Int, duration: Long) {
-        reset()
+//        reset()
         val anim = SlideAnimation(this, height)
         anim.interpolator = AccelerateInterpolator()
         anim.duration = duration

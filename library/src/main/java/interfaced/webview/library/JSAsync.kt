@@ -1,6 +1,7 @@
 package interfaced.webview.library
 
 import android.util.Log
+import android.util.TypedValue
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import kotlinx.serialization.json.Json
@@ -39,17 +40,19 @@ class JSAsync(
 
     @JavascriptInterface
     fun updateHeight(height: String) {
-        onUpdateHeight?.invoke(height.toInt())
+        webview.handler.post {
+            onUpdateHeight?.invoke(height.toInt().toAndroidHeight())
+        }
     }
 
     private fun reject(handler: String, error: String) {
-        webview.post {
+        webview.handler.post {
             webview.loadUrl("javascript:$handler.rejectNative('$error')")
         }
     }
 
     private fun resolve(handler: String, result: String? = "") {
-        webview.post {
+        webview.handler.post {
             if (result != null) {
                 webview.loadUrl("javascript:$handler.resolveNative($result)")
             } else {
@@ -57,4 +60,10 @@ class JSAsync(
             }
         }
     }
+
+    private fun Int.toAndroidHeight(): Int = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        toFloat(),
+        webview.resources.displayMetrics
+    ).toInt()
 }

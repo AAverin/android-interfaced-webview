@@ -1,42 +1,24 @@
 package apps.interfaced.webview.sample
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.webkit.URLUtil
-import android.webkit.WebView
-import android.widget.Toast
+import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
-import interfaced.webview.library.FeaturesConfig
-import interfaced.webview.library.NativeInterface
 import kotlinx.android.synthetic.main.sample_activity.*
-import kotlinx.serialization.json.JsonElement
 
-class SampleActivity : AppCompatActivity() {
+class SampleActivity: AppCompatActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.sample_activity)
 
-        webview.setup(
-            FeaturesConfig(),
-            object : NativeInterface {
+        button_single_webview.setOnClickListener {
+            startActivity(Intent(applicationContext, SingleWebviewActivity::class.java))
+        }
 
-            }, {
-                Log.d("SampleActivity", "onBodyHeightChanged $it")
-            }
-        )
-        webview.makeDebuggable()
-
-        button.setOnClickListener {
-            val urlText = url.text.toString()
-
-            if (urlText.isEmpty() || !URLUtil.isValidUrl(urlText)) {
-                Toast.makeText(this, "Please provide some valid url", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            webview.loadUrl(urlText)
+        button_recycler_webviews.setOnClickListener {
+            startActivity(Intent(applicationContext, RecyclerWebViewsActivity::class.java))
         }
     }
-
 }

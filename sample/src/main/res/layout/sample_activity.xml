@@ -3,22 +3,18 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/url"
-        android:text="https://example.com"
-        android:inputType="textWebEmailAddress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/button_single_webview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Single WebView"
+        />
 
     <Button
-        android:id="@+id/button"
-        android:text="LOAD"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <interfaced.webview.library.InterfacedWebView
-        android:id="@+id/webview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:id="@+id/button_recycler_webviews"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="WebViews in Recycler"
+        />
 
 </LinearLayout>
