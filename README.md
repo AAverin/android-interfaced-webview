@@ -72,8 +72,12 @@ webview.setup(
                 supportHeightUpdates = true
             ),
             object : NativeInterface {
-                override fun onBodyHeightChanged(height: JsonElement?): String {
-                    Log.d("SampleActivity", "onBodyHeightChanged $height")
+                fun showLoading(paramsJson: JsonElement?): String {
+
+                }
+
+                fun hideLoading(paramsJson: JsonElement?): String {
+
                 }
             }
         )

@@ -7,7 +7,7 @@ import android.view.animation.AccelerateInterpolator
 import android.webkit.WebView
 import interfaced.webview.library.animation.SlideAnimation
 
-class InterfacedWebView @JvmOverloads constructor(
+open class InterfacedWebView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
