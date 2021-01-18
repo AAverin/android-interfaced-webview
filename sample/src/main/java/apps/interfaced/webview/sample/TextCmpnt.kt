@@ -19,14 +19,4 @@ class TextCmpnt : Cmpnt<TextData>(R.layout.cmpnt_text) {
         super.setData(data)
         textView.text = data.text
     }
-
-    override fun onVisible() {
-        super.onVisible()
-        Log.d("TextCmpnt", "onVisible")
-    }
-
-    override fun onHidden() {
-        super.onHidden()
-        Log.d("TextCmpnt", "onHidden")
-    }
 }

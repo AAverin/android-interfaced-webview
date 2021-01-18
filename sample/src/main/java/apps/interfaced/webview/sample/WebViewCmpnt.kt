@@ -24,7 +24,6 @@ class WebViewCmpnt : Cmpnt<WebViewData>(R.layout.cmpnt_webview) {
 
     override fun onVisible() {
         super.onVisible()
-        Log.d("WebViewCmpnt", "onVisible")
         webview.setup(
             FeaturesConfig(),
             object : NativeInterface {},
@@ -36,7 +35,6 @@ class WebViewCmpnt : Cmpnt<WebViewData>(R.layout.cmpnt_webview) {
 
     override fun onHidden() {
         super.onHidden()
-        Log.d("WebViewCmpnt", "onHidden")
         webview.clean()
     }
 
